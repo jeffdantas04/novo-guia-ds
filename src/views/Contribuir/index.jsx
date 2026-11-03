@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { STEPS } from '../../config/regras.js'
 import { calcularRegras } from '../../config/regras.js'
 import { Stepper } from '../../components/Stepper.jsx'
@@ -8,17 +9,19 @@ import { Step4Detalhes } from './Step4Detalhes.jsx'
 import { Step5Referencias } from './Step5Referencias.jsx'
 import { Step6Revisao } from './Step6Revisao.jsx'
 import { montarMensagemDisplay } from '../../components/MessagePreview.jsx'
+import { montarCamposADO } from '../../envio/adoFormato.js'
+import { enviarParaADO } from '../../envio/enviarAdo.js'
 
-export function Contribuir({ formState, onToast }) {
+export function Contribuir({ formState, adoConfigState, onToast }) {
   const { state, setTipo, setSub, setModo, setNivel, setField, toggleSuperficie, goStep, limpar } = formState
+  const { config: adoConfig, setConfig: setAdoConfig, isConfigured: adoConfigured } = adoConfigState
+  const [sending, setSending] = useState(false)
   const r = calcularRegras(state)
   const last = state.step === STEPS.length - 1
 
   function handleCopiar() {
     const txt = montarMensagemDisplay(state, r)
-    const fallback = () => {
-      onToast('Texto não pôde ser copiado automaticamente. Selecione e use Ctrl+C.')
-    }
+    const fallback = () => onToast('Texto não pôde ser copiado. Selecione e use Ctrl+C.')
     try {
       navigator.clipboard.writeText(txt).then(() => onToast('Mensagem copiada'), fallback)
     } catch {
@@ -26,8 +29,27 @@ export function Contribuir({ formState, onToast }) {
     }
   }
 
-  function handleEnviar() {
-    onToast('Protótipo: no portal publicado, o envio cria o card no Kanban do Notion.')
+  async function handleEnviar() {
+    if (!adoConfigured) {
+      onToast('Configure org, projeto e PAT do Azure DevOps antes de enviar.')
+      return
+    }
+    const campos = montarCamposADO(state, r)
+    if (!campos) { onToast('Preencha tipo e escopo antes de enviar.'); return }
+    setSending(true)
+    try {
+      const result = await enviarParaADO(campos, adoConfig)
+      const id = result?.id
+      const url = result?._links?.html?.href
+      onToast(url
+        ? `Card #${id} criado no Azure DevOps — abra o link para ver`
+        : `Card #${id ?? '—'} criado no Azure DevOps`)
+      if (url) window.open(url, '_blank', 'noopener')
+    } catch (err) {
+      onToast(`Erro ao criar card: ${err.message}`)
+    } finally {
+      setSending(false)
+    }
   }
 
   function renderStep() {
@@ -37,7 +59,15 @@ export function Contribuir({ formState, onToast }) {
       case 2: return <Step3Proposta state={state} setField={setField} toggleSuperficie={toggleSuperficie} />
       case 3: return <Step4Detalhes state={state} setNivel={setNivel} setField={setField} r={r} />
       case 4: return <Step5Referencias state={state} setField={setField} />
-      case 5: return <Step6Revisao state={state} r={r} />
+      case 5: return (
+        <Step6Revisao
+          state={state}
+          r={r}
+          adoConfig={adoConfig}
+          setAdoConfig={setAdoConfig}
+          adoConfigured={adoConfigured}
+        />
+      )
       default: return null
     }
   }
@@ -74,8 +104,15 @@ export function Contribuir({ formState, onToast }) {
           {last ? (
             <span style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <button type="button" className="btn" onClick={handleCopiar}>Copiar mensagem</button>
-              {/* Enviar proposta: desabilitado no protótipo — integração Notion Kanban a implementar */}
-              <button type="button" className="btn primary" disabled onClick={handleEnviar}>Enviar proposta</button>
+              <button
+                type="button"
+                className="btn primary"
+                disabled={sending || !adoConfigured}
+                onClick={handleEnviar}
+                title={adoConfigured ? 'Criar work item no Azure DevOps' : 'Configure o Azure DevOps acima para habilitar'}
+              >
+                {sending ? 'Enviando…' : 'Enviar para ADO'}
+              </button>
             </span>
           ) : (
             <button
