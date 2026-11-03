@@ -3,14 +3,15 @@ import { FormSummary } from '../../components/FormSummary.jsx'
 import { MessagePreview, montarMensagemDisplay } from '../../components/MessagePreview.jsx'
 import { AdoConfigPanel } from '../../components/AdoConfigPanel.jsx'
 import { montarCamposADO } from '../../envio/adoFormato.js'
+import { resumoChecagem } from '../../envio/figmaCheck.js'
 
-export function Step6Revisao({ state, r, adoConfig, setAdoConfig, adoConfigured }) {
+export function Step6Revisao({ state, r, adoConfig, setAdoConfig, adoConfigured, figmaResult }) {
   const [adoOpen, setAdoOpen] = useState(false)
 
   if (!r) {
     return (
       <div className="panel-head">
-        <span className="eyebrow">Etapa 6 · Revisão</span>
+        <span className="eyebrow">Etapa 7 · Revisão</span>
         <h2>Faltam tipo e escopo</h2>
       </div>
     )
@@ -25,13 +26,13 @@ export function Step6Revisao({ state, r, adoConfig, setAdoConfig, adoConfigured 
   const falta = REQUIRED.filter(([k]) => !state[k]).map(([, l]) => l)
   if (!r.t.foundation && !state.modo) falta.push('Modo')
 
-  const msg = montarMensagemDisplay(state, r)
-  const adoCampos = montarCamposADO(state, r)
+  const msg = montarMensagemDisplay(state, r, figmaResult)
+  const adoCampos = montarCamposADO(state, r, figmaResult)
 
   return (
     <>
       <div className="panel-head">
-        <span className="eyebrow">Etapa 6 · Revisão e envio</span>
+        <span className="eyebrow">Etapa 7 · Revisão e envio</span>
         <h2>{state.titulo || 'Sem nome'}</h2>
         <p>Confira como sua contribuição vai seguir.</p>
       </div>
@@ -44,6 +45,12 @@ export function Step6Revisao({ state, r, adoConfig, setAdoConfig, adoConfigured 
       )}
 
       <FormSummary r={r} />
+
+      {figmaResult && (
+        <p className="note" style={{ margin: 0 }}>
+          Checagem automática: {resumoChecagem(figmaResult)}
+        </p>
+      )}
 
       {/* Teams */}
       <MessagePreview message={msg} />

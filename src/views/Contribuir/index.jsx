@@ -7,20 +7,23 @@ import { Step2Identificacao } from './Step2Identificacao.jsx'
 import { Step3Proposta } from './Step3Proposta.jsx'
 import { Step4Detalhes } from './Step4Detalhes.jsx'
 import { Step5Referencias } from './Step5Referencias.jsx'
+import { Step6Checagem } from './Step6Checagem.jsx'
 import { Step6Revisao } from './Step6Revisao.jsx'
 import { montarMensagemDisplay } from '../../components/MessagePreview.jsx'
 import { montarCamposADO } from '../../envio/adoFormato.js'
 import { enviarParaADO } from '../../envio/enviarAdo.js'
 
-export function Contribuir({ formState, adoConfigState, onToast }) {
+export function Contribuir({ formState, adoConfigState, figmaConfigState, onToast }) {
   const { state, setTipo, setSub, setModo, setNivel, setField, toggleSuperficie, goStep, limpar } = formState
   const { config: adoConfig, setConfig: setAdoConfig, isConfigured: adoConfigured } = adoConfigState
+  const { config: figmaConfig, setConfig: setFigmaConfig } = figmaConfigState
   const [sending, setSending] = useState(false)
+  const [figmaResult, setFigmaResult] = useState(null)
   const r = calcularRegras(state)
   const last = state.step === STEPS.length - 1
 
   function handleCopiar() {
-    const txt = montarMensagemDisplay(state, r)
+    const txt = montarMensagemDisplay(state, r, figmaResult)
     const fallback = () => onToast('Texto não pôde ser copiado. Selecione e use Ctrl+C.')
     try {
       navigator.clipboard.writeText(txt).then(() => onToast('Mensagem copiada'), fallback)
@@ -34,7 +37,7 @@ export function Contribuir({ formState, adoConfigState, onToast }) {
       onToast('Configure org, projeto e PAT do Azure DevOps antes de enviar.')
       return
     }
-    const campos = montarCamposADO(state, r)
+    const campos = montarCamposADO(state, r, figmaResult)
     if (!campos) { onToast('Preencha tipo e escopo antes de enviar.'); return }
     setSending(true)
     try {
@@ -60,12 +63,21 @@ export function Contribuir({ formState, adoConfigState, onToast }) {
       case 3: return <Step4Detalhes state={state} setNivel={setNivel} setField={setField} r={r} />
       case 4: return <Step5Referencias state={state} setField={setField} />
       case 5: return (
+        <Step6Checagem
+          figmaConfig={figmaConfig}
+          setFigmaConfig={setFigmaConfig}
+          savedResult={figmaResult}
+          onResult={setFigmaResult}
+        />
+      )
+      case 6: return (
         <Step6Revisao
           state={state}
           r={r}
           adoConfig={adoConfig}
           setAdoConfig={setAdoConfig}
           adoConfigured={adoConfigured}
+          figmaResult={figmaResult}
         />
       )
       default: return null

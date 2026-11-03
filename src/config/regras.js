@@ -49,6 +49,7 @@ export const STEPS = [
   'Proposta',
   'Detalhes',
   'Referências',
+  'Checagem automática',
   'Revisão e envio',
 ]
 

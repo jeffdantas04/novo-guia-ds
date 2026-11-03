@@ -7,9 +7,18 @@ export function MessagePreview({ message, onCopy }) {
   )
 }
 
-export function montarMensagemDisplay(state, r) {
+export function montarMensagemDisplay(state, r, figmaResult = null) {
   if (!r) return ''
   const sups = state.superficies.join(', ') || '-'
+  const checagem = figmaResult
+    ? (() => {
+        const icons = { pass: '✓', fail: '✗', warn: '⚠', skip: '–' }
+        const labels = { nomenclatura: 'Nomenclatura', variantes: 'Variantes', tokens: 'Tokens', icones: 'Ícones', contraste: 'Contraste' }
+        return '\nChecagem automática: ' + Object.entries(figmaResult.checks)
+          .map(([k, c]) => `${icons[c.status]} ${labels[k]}`)
+          .join(' · ')
+      })()
+    : ''
   return `[Proposta · ${r.t.p} · N${r.nivel}] ${state.titulo || 'Sem nome'}
 Tipo: ${r.t.nome} · ${r.sub.nome}
 Proponente: ${state.nome || '-'} (${state.frente || '-'})
@@ -22,5 +31,5 @@ Tokens: ${state.tokens || '-'}
 Referências: ${state.refs || '-'}
 Validação de produto: ${state.aprovacao || '-'}
 
-Validação: ${r.valida} · prazo de ${r.prazo}`
+Validação: ${r.valida} · prazo de ${r.prazo}${checagem}`
 }

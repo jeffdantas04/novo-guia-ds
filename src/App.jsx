@@ -6,6 +6,7 @@ import { Contribuir } from './views/Contribuir/index.jsx'
 import { useTheme } from './hooks/useTheme.js'
 import { useFormState } from './hooks/useFormState.js'
 import { useAdoConfig } from './hooks/useAdoConfig.js'
+import { useFigmaConfig } from './hooks/useFigmaConfig.js'
 
 function getView() {
   return window.location.hash === '#contribuir' ? 'contribuir' : 'documentacao'
@@ -17,6 +18,7 @@ export default function App() {
   const { label: themeLabel, cycle: cycleTheme } = useTheme()
   const formState = useFormState()
   const adoConfigState = useAdoConfig()
+  const figmaConfigState = useFigmaConfig()
 
   function handleView(v) {
     window.location.hash = v
@@ -48,7 +50,7 @@ export default function App() {
       <main className="main">
         {view === 'documentacao'
           ? <Documentacao />
-          : <Contribuir formState={formState} adoConfigState={adoConfigState} onToast={showToast} />
+          : <Contribuir formState={formState} adoConfigState={adoConfigState} figmaConfigState={figmaConfigState} onToast={showToast} />
         }
       </main>
       {toast && <Toast message={toast} onHide={() => setToast(null)} />}

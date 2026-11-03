@@ -2,7 +2,7 @@ function esc(s) {
   return String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
 }
 
-export function montarCamposADO(state, r) {
+export function montarCamposADO(state, r, figmaResult = null) {
   if (!r) return null
 
   const title = `[${r.t.p}·N${r.nivel}] ${state.titulo || 'Sem nome'}`
@@ -20,6 +20,16 @@ export function montarCamposADO(state, r) {
     `<p>${esc(state.refs || '-')}</p>`,
     '<h3>Validação de produto</h3>',
     `<p>${esc(state.aprovacao || '-')}</p>`,
+    ...(figmaResult ? [
+      '<h3>Checagem automática (Figma)</h3>',
+      '<ul>',
+      ...Object.entries(figmaResult.checks).map(([k, c]) => {
+        const labels = { nomenclatura: 'Nomenclatura', variantes: 'Variantes documentadas', tokens: 'Tokens vinculados', icones: 'Padrão de ícones', contraste: 'Contraste WCAG 2.1 AA' }
+        const icons = { pass: '✓', fail: '✗', warn: '⚠', skip: '–' }
+        return `<li>${icons[c.status]} ${esc(labels[k])}: ${esc(c.msg)}</li>`
+      }),
+      '</ul>',
+    ] : []),
     '<hr/>',
     `<p><em>Proposta por ${esc(state.nome || '-')} (${esc(state.frente || '-')}) · ${esc(r.t.nome)} ${esc(r.sub.nome)} · Valida: ${esc(r.valida)} · Prazo: ${esc(r.prazo)}</em></p>`,
   ].join('\n')
