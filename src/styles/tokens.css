@@ -1,0 +1,87 @@
+/* Tokens de design extraídos do portal-contribuicao.html */
+:root {
+  --bg: #F3F5F9;
+  --surface: #FFFFFF;
+  --surface-2: #EBEFF6;
+  --line: #D7DDE8;
+  --fg: #121A2C;
+  --muted: #56627A;
+  --accent: #2350D2;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E2E9FC;
+  --side-bg: #0F1727;
+  --side-fg: #DCE3F1;
+  --side-muted: #8592AB;
+  --side-line: #223049;
+  --side-active: #1B2740;
+  --n1: #1C7F53;
+  --n1-soft: #DDF2E7;
+  --n2: #A56A12;
+  --n2-soft: #FBEED6;
+  --n3: #B8332C;
+  --n3-soft: #F9E0DE;
+  --warn-soft: #FFF4D6;
+  --warn: #8A5A00;
+  --f-display: "Sora", "Segoe UI", system-ui, sans-serif;
+  --f-body: "DM Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  --r: 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0A101C;
+    --surface: #111A2B;
+    --surface-2: #172238;
+    --line: #24314B;
+    --fg: #E6EBF5;
+    --muted: #94A1BA;
+    --accent: #7096FF;
+    --accent-ink: #0A101C;
+    --accent-soft: #1B2852;
+    --side-bg: #070C16;
+    --side-fg: #DCE3F1;
+    --side-muted: #7B88A1;
+    --side-line: #1A253A;
+    --side-active: #152039;
+    --n1: #4BC98F;
+    --n1-soft: #12301F;
+    --n2: #E5AA45;
+    --n2-soft: #33270F;
+    --n3: #F0736A;
+    --n3-soft: #3A1715;
+    --warn-soft: #33270F;
+    --warn: #E5AA45;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0A101C;
+  --surface: #111A2B;
+  --surface-2: #172238;
+  --line: #24314B;
+  --fg: #E6EBF5;
+  --muted: #94A1BA;
+  --accent: #7096FF;
+  --accent-ink: #0A101C;
+  --accent-soft: #1B2852;
+  --side-bg: #070C16;
+  --side-fg: #DCE3F1;
+  --side-muted: #7B88A1;
+  --side-line: #1A253A;
+  --side-active: #152039;
+  --n1: #4BC98F;
+  --n1-soft: #12301F;
+  --n2: #E5AA45;
+  --n2-soft: #33270F;
+  --n3: #F0736A;
+  --n3-soft: #3A1715;
+  --warn-soft: #33270F;
+  --warn: #E5AA45;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
